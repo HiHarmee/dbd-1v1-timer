@@ -1,0 +1,45 @@
+# ===== Python =====
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.venv/
+venv/
+env/
+
+# ===== PyInstaller build artifacts =====
+build/
+dist/
+*.spec
+build_out.txt
+build_err.txt
+
+# ===== Personal runtime data (do not publish) =====
+config.json
+history.json
+timer.log
+*.log
+
+# ===== OS / editor noise =====
+.DS_Store
+Thumbs.db
+desktop.ini
+.vscode/
+.idea/
+*.tmp
+*.bak
+~$*
+
+# ===== Local calibration screenshots (dev only) =====
+# Keep downed_ref_roi.png: it is the runtime detection template.
+circle_*.png
+icon_*.png
+row_*.png
+slot_*.png
+prop_slot*.png
+r[0-9]_left.png
+hud_crop.png
+wide_hud.png
+surv_strip.png
+icons_strip.png
+four_icons.png
