@@ -219,6 +219,7 @@ sound_engine.py      Optional cue playback
 downed_ref_roi.png   Detection template (required at runtime)
 run_timer.bat        One-click launcher (elevates, installs deps)
 run_debug.bat        Launcher with debug panel + ROI box
+啟動單挑計時器.bat    Alias launcher (Chinese name)
 build.bat            One-click PyInstaller build
 ```
 
