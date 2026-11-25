@@ -6,6 +6,10 @@ Track your round time and first-hit time without tabbing out of the game. A sing
 starts a round and records it when the survivor is down; the overlay also detects the
 "downed" state on screen and records the round for you.
 
+> **Anti-cheat**: nothing here reads or writes game memory, injects code, hooks the game,
+> or simulates input. It runs entirely outside Dead by Daylight. See the
+> [Anti-cheat notice](#anti-cheat-notice).
+
 ---
 
 ## Highlights
@@ -51,7 +55,7 @@ All keys and the auto-detection sensitivity are configurable in **Settings > Hot
 ## Quick start (from source)
 
 1. Install Python 3.10+ and make sure `python` is on `PATH`.
-2. Double-click **`run_timer.bat`** (or the Chinese alias launcher).
+2. Double-click **`run_timer.bat`** (or `啟動單挑計時器.bat`).
 
 What the launcher does:
 
@@ -120,6 +124,70 @@ An **Advanced / Debug** section is collapsed by default.
 Typical offline validation of the shipped template: downed = 1.000, injured = 0.263,
 healthy = 0.078. Re-calibrate the ROI and threshold in **Settings > Auto-detect** if your
 resolution or HUD scale differs.
+
+---
+
+## Anti-cheat notice
+
+This tool is designed to run **outside** the game. It never touches the Dead by Daylight
+process, its memory, or its input pipeline.
+
+### What it deliberately does NOT do
+
+| Technique | Used? |
+| --- | --- |
+| Process memory read / write (`ReadProcessMemory`, `WriteProcessMemory`) | No |
+| DLL injection, remote threads (`CreateRemoteThread`, `LoadLibrary`) | No |
+| API hooking (`SetWindowsHookEx`, `SetWinEventHook`) | No |
+| Input simulation or macros (`SendInput`, `keybd_event`, `mouse_event`, `PostMessage`) | No |
+| Kernel drivers or device I/O (`DeviceIoControl`, named device handles) | No |
+| Foreground window sniffing (`GetForegroundWindow`) | No - it cannot even tell DBD is running |
+
+### What it actually uses
+
+| API | Purpose | When |
+| --- | --- | --- |
+| `GetAsyncKeyState` | Poll the state of your bound keys | Only while the timer runs |
+| GDI `BitBlt` + `GetDC(None)` | Capture a 93x74 px region of the **desktop** for down detection | **Only if** Auto-detect is enabled |
+| `SetWindowLong` / `SetWindowRgn` | Click-through style and window shape for **its own** overlay | Always |
+| `ImmAssociateContextW` | Detach the IME from **its own** window | Always |
+
+`GetAsyncKeyState` is a read-only query, not a keyboard hook - the same API used by
+push-to-talk in voice chat apps. `BitBlt` captures the desktop, not the game process,
+and only when you enable automatic down detection.
+
+### Why it needs administrator rights
+
+Dead by Daylight runs with high integrity under Easy Anti-Cheat. Windows UIPI blocks
+hotkey polling from a lower-integrity process, so the launchers elevate to the same
+level. Elevation is used for input visibility only - the program asks for no privileges
+over the game.
+
+### Is it cheating?
+
+The tool records elapsed time, which a human could measure with a stopwatch. It cannot
+read, display, or infer hidden game state (no survivor perks, no positions, no
+cooldowns). It never acts on your behalf.
+
+### Risks you accept
+
+- **Easy Anti-Cheat decides.** No third-party tool can guarantee acceptance, and
+  detection heuristics can change with any update.
+- **Tournaments and official events** usually forbid any external assistance. Do not use
+  this there.
+- **Publisher terms** prohibit software that grants an unfair advantage. A plain round
+  timer is a grey area and enforcement is at Behaviour Interactive's discretion.
+- Read-only screen capture (only with Auto-detect on) is the single technical contact
+  point with the rendered game image.
+
+### Lowest-footprint mode
+
+Disable **Auto-detect** in Settings. The detection worker is then never started, so the
+program performs **zero screen captures** and only polls key states while drawing its own
+overlay - equivalent to using a stopwatch.
+
+Use at your own risk. This is an unofficial companion tool, not affiliated with or
+endorsed by Behaviour Interactive Inc.
 
 ---
 
