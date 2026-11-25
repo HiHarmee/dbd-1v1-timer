@@ -55,7 +55,7 @@ All keys and the auto-detection sensitivity are configurable in **Settings > Hot
 ## Quick start (from source)
 
 1. Install Python 3.10+ and make sure `python` is on `PATH`.
-2. Double-click **`run_timer.bat`** (or `啟動單挑計時器.bat`).
+2. Double-click **`run_timer.bat`** (or the Chinese alias launcher).
 
 What the launcher does:
 
@@ -219,9 +219,10 @@ sound_engine.py      Optional cue playback
 downed_ref_roi.png   Detection template (required at runtime)
 run_timer.bat        One-click launcher (elevates, installs deps)
 run_debug.bat        Launcher with debug panel + ROI box
-啟動單挑計時器.bat    Alias launcher (Chinese name)
 build.bat            One-click PyInstaller build
 ```
+
+A Chinese-named alias launcher is included as well; it simply forwards to `run_timer.bat`.
 
 ---
 
