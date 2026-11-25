@@ -138,7 +138,7 @@ class DownedIconDetector:
 
             if not self.use_icon_detection:
                 return False, {"score": 0.0, "threshold": self.threshold,
-                       "bbox": self.bbox, "region": region, "error": None}
+                               "bbox": self.bbox, "region": region, "error": None}
 
             is_downed, score = self.matcher.is_downed(region)
             return is_downed, {
@@ -153,11 +153,11 @@ class DownedIconDetector:
 
 
     def _loop(self):
-        """裌暯硞聽迴圈 (發抗：連續 required_consecutive 幀才切換狀態"�""
+        """背景監聽迴圈 (防抖：連續 required_consecutive 幀才切換狀態)"""
         while self.running:
             try:
                 is_downed, _stats = self.analyze_frame()
-                # 保存最新結果仙 UI 讀取，UI 不再自行截圜
+                # 保存最新結果供 UI 讀取，UI 不再自行截圖
                 self.last_result = (is_downed, _stats)
 
                 if is_downed:
@@ -182,5 +182,5 @@ class DownedIconDetector:
             time.sleep(max(0.02, self.check_interval_ms / 1000.0))
 
 
-# 向後相容缚保留舊介面名笱
+# 向後相容：保留舊介面名稱
 ScreenAutoDetector = DownedIconDetector
