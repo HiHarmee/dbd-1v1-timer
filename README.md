@@ -1,10 +1,10 @@
-# DBD 1v1 Timer
+# DBD 1v1 Timer - Auto Stop Overlay
 
 **A lightweight, always-on-top overlay stopwatch for Dead by Daylight 1v1 (custom match) rounds.**
 
 Track your round time and first-hit time without tabbing out of the game. A single key
-starts a round and records it when the survivor is down; the overlay also detects the
-"downed" state on screen and records the round for you.
+starts a round and records it when the survivor is down; with auto stop enabled the
+overlay detects the down itself, stops the clock and arms the next round.
 
 > **Anti-cheat**: nothing here reads or writes game memory, injects code, hooks the game,
 > or simulates input. It runs entirely outside Dead by Daylight. See the
@@ -15,8 +15,8 @@ starts a round and records it when the survivor is down; the overlay also detect
 ## Highlights
 
 - **One-key round flow** - `T` starts a round, records the down time, and starts the next round.
-- **Automatic down detection** - template matching on the red character icon (Dice coefficient),
-  so a down is recorded even if you forget to press the key.
+- **Auto stop on down** - detects the downed icon on screen, stops the clock, records the
+  down time and ends the round automatically, then arms the next round when the icon is gone.
 - **First-hit mark** - `F2` records only the first hit of the round.
 - **Fast screen capture** - GDI capture takes ~11 ms per frame (vs ~54 ms with `ImageGrab`),
   with an automatic fallback when GDI is unavailable.
@@ -40,7 +40,7 @@ starts a round and records it when the survivor is down; the overlay also detect
 | Toggle sound | `F8` | |
 | Open settings | Gear button on the HUD | |
 
-All keys and the auto-detection sensitivity are configurable in **Settings > Hotkeys / Auto-detect**.
+All keys and the auto-detection sensitivity are configurable in **Settings > Hotkeys / Down Detection**.
 
 ---
 
@@ -102,7 +102,7 @@ The Settings window has six tabs:
 | --- | --- |
 | Hotkeys | Rebind every action |
 | Sound | Enable/disable cues and pick volume |
-| Auto-detect | Toggle down detection, adjust ROI and match threshold |
+| Down Detection | Toggle auto stop, adjust ROI and match threshold |
 | Appearance | Font size, colors, language (English / zh-TW) |
 | Startup | Remember HUD position, launch options |
 | History | Review recorded rounds (stored in `history.json`) |
@@ -122,8 +122,37 @@ An **Advanced / Debug** section is collapsed by default.
    down; the round is recorded and the next round is armed automatically.
 
 Typical offline validation of the shipped template: downed = 1.000, injured = 0.263,
-healthy = 0.078. Re-calibrate the ROI and threshold in **Settings > Auto-detect** if your
-resolution or HUD scale differs.
+healthy = 0.078. Re-calibrate the ROI and threshold in **Settings > Down Detection** if
+your resolution or HUD scale differs.
+
+---
+
+## Auto stop
+
+With **Down Detection** enabled, the timer stops by itself - no key press needed.
+
+| Event | What the timer does |
+| --- | --- |
+| Downed icon appears (2 consecutive frames) | Stops the clock, shows the down time, saves the round to `history.json` and ends the round |
+| Downed icon disappears (2 consecutive frames) | Arms the next round (counter + 1, clock back to `00:00.00`) |
+| `T` pressed after a down was already recorded | Ignored - the round is already saved |
+
+State changes need **2 consecutive matching frames** (debounce). The ROI is re-checked
+every `check_interval` ms (default `150`). Manual `T` / `F2` / `Del` keep working at all
+times, so auto stop is a convenience layer rather than a replacement.
+
+### Turning auto stop off
+
+**Settings > Down Detection > uncheck "Enable auto pause / resume on down".**
+
+The detection thread is then never created: no screen capture, no image comparison, and
+the overlay behaves as a plain manual stopwatch (see the
+[Anti-cheat notice](#anti-cheat-notice)).
+
+### Why it is not a macro
+
+Auto stop only *reads* pixels and *stops its own clock*. It never sends a key press or a
+click to the game, so it cannot play the game for you.
 
 ---
 
@@ -148,7 +177,7 @@ process, its memory, or its input pipeline.
 | API | Purpose | When |
 | --- | --- | --- |
 | `GetAsyncKeyState` | Poll the state of your bound keys | Only while the timer runs |
-| GDI `BitBlt` + `GetDC(None)` | Capture a 93x74 px region of the **desktop** for down detection | **Only if** Auto-detect is enabled |
+| GDI `BitBlt` + `GetDC(None)` | Capture a 93x74 px region of the **desktop** for auto stop | **Only if** Down Detection is enabled |
 | `SetWindowLong` / `SetWindowRgn` | Click-through style and window shape for **its own** overlay | Always |
 | `ImmAssociateContextW` | Detach the IME from **its own** window | Always |
 
@@ -177,12 +206,12 @@ cooldowns). It never acts on your behalf.
   this there.
 - **Publisher terms** prohibit software that grants an unfair advantage. A plain round
   timer is a grey area and enforcement is at Behaviour Interactive's discretion.
-- Read-only screen capture (only with Auto-detect on) is the single technical contact
+- Read-only screen capture (only with Down Detection on) is the single technical contact
   point with the rendered game image.
 
 ### Lowest-footprint mode
 
-Disable **Auto-detect** in Settings. The detection worker is then never started, so the
+Disable **Down Detection** in Settings. The detection worker is then never started, so the
 program performs **zero screen captures** and only polls key states while drawing its own
 overlay - equivalent to using a stopwatch.
 
@@ -196,8 +225,8 @@ endorsed by Behaviour Interactive Inc.
 | Symptom | Fix |
 | --- | --- |
 | Keys do nothing inside the game | Run as administrator (both launcher scripts elevate automatically). |
-| Down is not detected | Check the ROI in `--debug`, then lower `match_threshold`. |
-| False "down" detections | Raise `match_threshold` to 0.55-0.6. |
+| Auto stop does not trigger | Check the ROI in `--debug`, then lower `match_threshold`. |
+| Auto stop triggers too early | Raise `match_threshold` to 0.55-0.6. |
 | Exe closes immediately | Run `DBDTimer.exe --debug` from a console, or check `timer.log`. |
 | HUD is stuck / cannot click | Press `F4` to unlock click-through. |
 
