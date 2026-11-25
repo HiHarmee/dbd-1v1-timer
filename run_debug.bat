@@ -6,7 +6,7 @@ title DBD 計時器 - 除錯模式
 net session >nul 2>&1
 if %errorLevel% neq 0 (
     echo [提示] 正在請求管理員權限...
-    powershell -NoProfile -ExecutionPolicy Bypass -Command "Start-Process cmd -ArgumentList '/c ""%~f0"" %*' -Verb RunAs"
+    powershell -NoProfile -ExecutionPolicy Bypass -Command "Start-Process cmd -ArgumentList '/c \"\"%~f0\"\" %*' -Verb RunAs"
     exit /b
 )
 

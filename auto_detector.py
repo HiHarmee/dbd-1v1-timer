@@ -10,8 +10,11 @@ import time
 import threading
 import ctypes
 
-from PIL import ImageGrab  # 備援截圖 (Pillow 為必要依賴)
-PIL_AVAILABLE = True
+try:
+    from PIL import ImageGrab  # noqa: F401  (備援截圖)
+    PIL_AVAILABLE = True
+except ImportError:
+    PIL_AVAILABLE = False
 
 import numpy as np
 from icon_detector import DownedIconMatcher
@@ -28,7 +31,7 @@ class DownedIconDetector:
         on_down_callback: 偵測到倒地時呼叫 (自動暫停)
         on_undowned_callback: 偵測到救起時呼叫 (自動續算)
         custom_bbox: (x1, y1, x2, y2) 螢幕絕對座標，None 則依解析度計算
-        threshold: Dice 門檻
+        threshold: NCC 門檻
     """
 
     def __init__(self, on_down_callback=None, on_undowned_callback=None,
@@ -124,7 +127,7 @@ class DownedIconDetector:
     def analyze_frame(self):
         """
         擷取 bbox 畫面並比對，回傳 (is_downed, stats)
-        stats 包含 score (Dice)、threshold、bbox 與 region (ROI numpy 陣列，供除錯預覽)
+        stats 包含 score (NCC)、threshold、bbox 與 region (ROI numpy 陣列，供除錯預覽)
         """
         if not PIL_AVAILABLE:
             return False, {"error": "PIL not available"}
@@ -135,7 +138,7 @@ class DownedIconDetector:
 
             if not self.use_icon_detection:
                 return False, {"score": 0.0, "threshold": self.threshold,
-                               "bbox": self.bbox, "region": region, "error": None}
+                       "bbox": self.bbox, "region": region, "error": None}
 
             is_downed, score = self.matcher.is_downed(region)
             return is_downed, {
@@ -150,11 +153,11 @@ class DownedIconDetector:
 
 
     def _loop(self):
-        """背景監聽迴圈 (防抖：連續 required_consecutive 幀才切換狀態)"""
+        """裌暯硞聽迴圈 (發抗：連續 required_consecutive 幀才切換狀態"�""
         while self.running:
             try:
                 is_downed, _stats = self.analyze_frame()
-                # 保存最新結果供 UI 讀取，UI 不再自行截圖
+                # 保存最新結果仙 UI 讀取，UI 不再自行截圜
                 self.last_result = (is_downed, _stats)
 
                 if is_downed:
@@ -179,5 +182,5 @@ class DownedIconDetector:
             time.sleep(max(0.02, self.check_interval_ms / 1000.0))
 
 
-# 向後相容：保留舊介面名稱
+# 向後相容缚保留舊介面名笱
 ScreenAutoDetector = DownedIconDetector
