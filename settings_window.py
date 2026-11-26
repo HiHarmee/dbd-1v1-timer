@@ -196,7 +196,8 @@ class SettingsWindow:
         row = tk.Frame(c, bg=CARD)
         row.pack(anchor="w")
         self._radio(row, tr("settings.appearance.lang_en"), "en", self.lang_var).pack(side=tk.LEFT, padx=(0, 12))
-        self._radio(row, tr("settings.appearance.lang_zh"), "zh-TW", self.lang_var).pack(side=tk.LEFT)
+        self._radio(row, tr("settings.appearance.lang_zh"), "zh-TW", self.lang_var).pack(side=tk.LEFT, padx=(0, 12))
+        self._radio(row, tr("settings.appearance.lang_zh_cn"), "zh-CN", self.lang_var).pack(side=tk.LEFT)
 
     def _build_hotkeys_tab(self):
         page = self._add_tab(tr("settings.tabs.hotkeys"))
@@ -449,3 +450,4 @@ class SettingsWindow:
         self.sound_engine.set_config(volume=self.volume_var.get(),
                                      sound_style=self.sound_style_var.get(), enabled=True)
         self.sound_engine.play(sound_type)
+

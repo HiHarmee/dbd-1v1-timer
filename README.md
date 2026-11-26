@@ -24,7 +24,7 @@ overlay detects the down itself, stops the clock and arms the next round.
   in the Settings window.
 - **Cue flashes** - the digits flash at 30 s and 60 s as a quiet timing reminder.
 - **Click-through overlay** - lock the HUD with `F4`; it stays on top and never steals focus.
-- **Bilingual UI** - English and Traditional Chinese (`zh-TW`), switchable in Settings.
+- **Multilingual UI** - English, Simplified Chinese (`zh-CN`) and Traditional Chinese (`zh-TW`), switchable in Settings.
 - **Ready-to-ship build** - `build.bat` produces a single `DBDTimer.exe` (no Python needed).
 
 ---
@@ -103,7 +103,7 @@ The Settings window has six tabs:
 | Hotkeys | Rebind every action |
 | Sound | Enable/disable cues and pick volume |
 | Down Detection | Toggle auto stop, adjust ROI and match threshold |
-| Appearance | Font size, colors, language (English / zh-TW) |
+| Appearance | Font size, colors, language (English / zh-CN / zh-TW) |
 | Startup | Remember HUD position, launch options |
 | History | Review recorded rounds (stored in `history.json`) |
 

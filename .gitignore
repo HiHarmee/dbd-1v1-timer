@@ -36,6 +36,7 @@ circle_*.png
 icon_*.png
 row_*.png
 slot_*.png
+slot[0-9]_*.png
 prop_slot*.png
 r[0-9]_left.png
 hud_crop.png
